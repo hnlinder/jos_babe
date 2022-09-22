@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{physics}
+
+\usepackage{hyperref}
+\usepackage{listings}
+\title{notes.tex }
+\author{Henrik Linder}
+\date{\today}
+\begin{document}
+\maketitle
+
+Unless you got some more help that I couldn't see, this task is poorly formulated and very hard for a course like this.
+
+Not sure what kind of background you guys have in differential equations, but you got this one
+\begin{equation}
+	a_z = \frac{B}{m} - g - \left(\frac{D}{m}\right)  \left| v_z\right| v_z, 
+\end{equation}
+which seems fairly appropriate for the problem at hand.
+
+This equation can be rewritten as 
+\begin{equation}
+	a_z = \alpha - \beta  \left| v_z\right| v_z, 
+\end{equation}
+if we define $\alpha = \frac{B}{m} - g$ and $\beta = \left(\frac{D}{m}\right)$. 
+
+Now just move everything to the Left Hand Side (LHS) and rename $v = y$, $a = y'$ and we have the differential equation on standard form: 
+\begin{equation}
+	y' - \alpha + \beta y^2 = 0 .
+\end{equation}
+
+That was the easy part! The issue is that this is a non-homogeneous, \href{https://en.wikipedia.org/wiki/Differential\_equation#Non-linear\_differential\_equations}{non-linear differential equation}. Those are in general \textit{very} hard to solve analytically. You can see \href{https://www.wolframalpha.com/input?i=y\%27++-+alpha+\%2B+beta+*+y\%5E2+\%3D+0}{the analytical solution for this particular one here}, but trust me it's a headache. 
+
+
+You can however, fairly easily, solve it numerically by taking a small step forward in time, checking what the acceleration was at the last time step, and increasing your velocity by that much. Now you have your new velocity, and you can use that to find your new acceleration, which is used to find the velocity in the next time step, etc... 
+
+For example, if our time step is 0.1 s, then at the start, the algorithm would be 
+\begin{itemize}
+	\item \textbf{t=0   \quad   }    $v_0=0$
+	\item \textbf{t=0   \quad   }    $a_0=\frac{B}{m} - g$
+	\item \textbf{t=0.1\quad}  $v_{0.1}=0+a_0\cdot dt = (\frac{B}{m} - g)\cdot 0.1$
+	\item \textbf{t=0.1\quad}  $a_{0.1}=\frac{B}{m} - g - \left(\frac{D}{m}\right) v_{0.1}^2$
+\end{itemize}
+
+
+
+What I described there is roughly the \href{https://en.wikipedia.org/wiki/Euler\_method}{Forward Euler method}. If you're interested in the fascinating world of numerical integration, id recommend reading about \href{https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods}{Runge-Kutta methods}. If you're interested in music, I'd recommend watching \href{https://www.youtube.com/watch?v=eJxZQ6f37zY&t=2s}{Yunge Kutta}.
+
+I also did a quick and dirty implementation of that algorithm in a matlab script, also pasted below. 
+
+
+\newpage
+\begin{lstlisting}[language = matlab]
+%I usually close and clear at start of main script,
+%It can save a lot of headaches
+close all
+clear
+
+m = 1200e-3;    %g ??   SI units? I wrote in kg now
+D = 2.23;       %kg/m   ? assumption?
+g = 9.82;       %m/s^2
+d = 1.11;       %m      ? assumption?
+B = 71.63;      %N      ? assumption?
+rho = 1.293;    %kg/m^3 ? just says k/m^3
+
+% Anonymous function for acceleration as a function of velocity.
+% Just to make it easier to read in the loop
+acceleration_function = @(v) B/m - g - (D/m) *abs(v)*v;
+
+% Time step, good enough for this simulation
+dt = .01
+
+%initialize variables
+t = linspace(0,5,1/dt);
+t_length = length(t);
+v = zeros(t_length,1);
+a = zeros(t_length,1);
+z = zeros(t_length,1);
+
+%acceleration is not zero at t=0,
+%so we define an initial acceleration for v=0
+a(1) = acceleration_function(v(1));
+
+%loop where we update the current velocity
+%based on previous velocity and acceleration
+for i = 2:t_length
+  v(i) = v(i-1) + a(i-1)*dt;
+  z(i) = z(i-1) + v(i-1)*dt;
+  a(i) = acceleration_function(v(i));
+end
+
+%plot the results
+plot(t,v)
+xlabel("Time [s]")
+ylabel("Velocity [m/s]")
+grid on
+
+figure
+plot(t,z)
+xlabel("Time [s]")
+ylabel("Height [m]")
+grid on
+%text(2.5,4,"Note terminal velocity up here")
+\end{lstlisting}
+
+
+
+\end{document}
