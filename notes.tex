@@ -43,8 +43,10 @@ For example, if our time step is 0.1 s, then at the start, the algorithm would b
 \begin{itemize}
 	\item \textbf{t=0   \quad   }    $v_0=0$
 	\item \textbf{t=0   \quad   }    $a_0=\frac{B}{m} - g$
-	\item \textbf{t=0.1\quad}  $v_{0.1}=0+a_0\cdot dt = (\frac{B}{m} - g)\cdot 0.1$
+	\item \textbf{t=0.1\quad}  $v_{0.1}=v_0+a_0\cdot dt = 0 + (\frac{B}{m} - g)\cdot 0.1$
 	\item \textbf{t=0.1\quad}  $a_{0.1}=\frac{B}{m} - g - \left(\frac{D}{m}\right) v_{0.1}^2$
+	\item \textbf{t=t$_n$   \quad   }    $v_n = t_{n-1} + a_{n-1}\cdot dt$
+	\item \textbf{t=t$_n$   \quad   }    $a_{n}=\frac{B}{m} - g - \left(\frac{D}{m}\right) v_{n}^2  $
 \end{itemize}
 
 
