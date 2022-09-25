@@ -9,7 +9,7 @@
 
 \usepackage{hyperref}
 \usepackage{listings}
-\title{notes.tex }
+\title{Notes while solving}
 \author{Henrik Linder}
 \date{\today}
 \begin{document}
@@ -22,6 +22,11 @@ Not sure what kind of background you guys have in differential equations, but yo
 	a_z = \frac{B}{m} - g - \left(\frac{D}{m}\right)  \left| v_z\right| v_z, 
 \end{equation}
 which seems fairly appropriate for the problem at hand.
+
+\noindent\rule{\linewidth}{.4pt}
+%\vspace{4pt}
+
+\textit{Warning: unnecessary but interesting sidenote about the differential equation coming}
 
 This equation can be rewritten as 
 \begin{equation}
@@ -36,6 +41,8 @@ Now just move everything to the Left Hand Side (LHS) and rename $v = y$, $a = y'
 
 That was the easy part! The issue is that this is a non-homogeneous, \href{https://en.wikipedia.org/wiki/Differential\_equation#Non-linear\_differential\_equations}{non-linear differential equation}. Those are in general \textit{very} hard to solve analytically. You can see \href{https://www.wolframalpha.com/input?i=y\%27++-+alpha+\%2B+beta+*+y\%5E2+\%3D+0}{the analytical solution for this particular one here}, but trust me it's a headache. 
 
+
+\noindent\rule{\linewidth}{.4pt}
 
 You can however, fairly easily, solve it numerically by taking a small step forward in time, checking what the acceleration was at the last time step, and increasing your velocity by that much. Now you have your new velocity, and you can use that to find your new acceleration, which is used to find the velocity in the next time step, etc... 
 
@@ -55,6 +62,13 @@ What I described there is roughly the \href{https://en.wikipedia.org/wiki/Euler\
 
 I also did a quick and dirty implementation of that algorithm in a matlab script, also pasted below. 
 
+This script gives a much steeper curve to terminal velocity than the one shown in the book. This may be due to assumptions regarding the constants. If you want to make the graph look nicer, I'd suggest solving for $a_z = 0$ and plugging in the terminal velocity from the book's graph so that you can play around with the constants in the right proportions, i.e.
+\begin{equation}
+	\begin{split}
+	&a_z = 0\implies\\
+	&\frac{B}{m} - g = \left(\frac{D}{m}\right)v_{\text{terminal}}^2.
+	\end{split}
+\end{equation}
 
 \newpage
 \begin{lstlisting}[language = matlab]
@@ -77,8 +91,9 @@ acceleration_function = @(v) B/m - g - (D/m) *abs(v)*v;
 % Time step, good enough for this simulation
 dt = .01
 
-%initialize variables
-t = linspace(0,5,1/dt);
+%initialize vectors that will be used in loop
+tmax = 5;
+t = linspace(0,tmax,tmax/dt);
 t_length = length(t);
 v = zeros(t_length,1);
 a = zeros(t_length,1);
@@ -96,18 +111,19 @@ for i = 2:t_length
   a(i) = acceleration_function(v(i));
 end
 
-%plot the results
-plot(t,v)
+%plot the results for velocity...
+plot(t,v, ".")
 xlabel("Time [s]")
 ylabel("Velocity [m/s]")
 grid on
+text(2.5,4.5,"Note terminal velocity up here")
 
+%...and height
 figure
 plot(t,z)
 xlabel("Time [s]")
 ylabel("Height [m]")
 grid on
-%text(2.5,4,"Note terminal velocity up here")
 \end{lstlisting}
 
 

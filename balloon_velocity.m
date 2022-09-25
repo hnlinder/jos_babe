@@ -17,8 +17,9 @@ acceleration_function = @(v) B/m - g - (D/m) *abs(v)*v;
 % Time step, good enough for this simulation
 dt = .01
 
-%initialize variables
-t = linspace(0,5,1/dt);
+%initialize vectors that will be used in loop
+tmax = 5;
+t = linspace(0,tmax,tmax/dt);
 t_length = length(t);
 v = zeros(t_length,1);
 a = zeros(t_length,1);
@@ -36,15 +37,16 @@ for i = 2:t_length
   a(i) = acceleration_function(v(i));
 end
 
-%plot the results
-plot(t,v)
+%plot the results for velocity...
+plot(t,v, ".")
 xlabel("Time [s]")
 ylabel("Velocity [m/s]")
 grid on
+text(2.5,4.5,"Note terminal velocity up here")
 
+%...and height
 figure
 plot(t,z)
 xlabel("Time [s]")
 ylabel("Height [m]")
 grid on
-%text(2.5,4,"Note terminal velocity up here")
